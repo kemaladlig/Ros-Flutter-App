@@ -12,9 +12,12 @@ class ExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Roslib Example',
-      home: HomePage(),
+      theme: ThemeData(
+        primaryColor: const Color(0xFFe21c24),
+      ),
+      home: const HomePage(),
     );
   }
 }
@@ -35,6 +38,8 @@ class _HomePageState extends State<HomePage> {
   late Topic battery_state;
   late Topic odom;
   late Topic client_count;
+  late Topic sensor_state;
+  late double sensor_battery;
 
   @override
   void initState() {
@@ -75,7 +80,13 @@ class _HomePageState extends State<HomePage> {
         reconnectOnClose: true,
         queueLength: 10,
         queueSize: 10);
-
+    sensor_state = Topic(
+        ros: ros,
+        name: 'sensor_state',
+        type: "turtlebot3_msgs/SensorState",
+        reconnectOnClose: true,
+        queueLength: 10,
+        queueSize: 10);
     super.initState();
   }
 
@@ -94,17 +105,19 @@ class _HomePageState extends State<HomePage> {
     ros.connect();
     await cmd_vel.advertise();
     await diagnostic.subscribe();
+    await sensor_state.subscribe();
     //await battery_state.subscribe();
     //await odom.subscribe();
-    await client_count.subscribe();
+    //await client_count.subscribe();
     setState(() {});
   }
 
   void destroyConnection() async {
     await diagnostic.unsubscribe();
+    await sensor_state.unsubscribe();
     //await battery_state.unsubscribe();
     //await odom.unsubscribe();
-    await client_count.unsubscribe();
+    //await client_count.unsubscribe();
     await ros.close();
     setState(() {});
   }
@@ -122,8 +135,14 @@ class _HomePageState extends State<HomePage> {
       stream: ros.statusStream,
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         return Scaffold(
-          backgroundColor: Colors.white70,
-          appBar: AppBar(title: const Text('Teleop app'), centerTitle: true),
+          appBar: AppBar(
+            title: const Text('Turtlebot'),
+            centerTitle: true,
+            //backgroundColor: Colors.purple,
+            actions: [
+              IconButton(onPressed: () => {}, icon: const Icon(Icons.settings))
+            ],
+          ),
           body: Container(
             margin:
                 const EdgeInsets.only(top: 20, bottom: 20, right: 20, left: 20),
@@ -139,8 +158,13 @@ class _HomePageState extends State<HomePage> {
                         Map<String, dynamic> data =
                             jsonDecode(jsonEncode(snapshot2.data));
                         if (snapshot2.hasData) {
-                          return Text(
-                              'name: ${data['msg']['status'][0]['name']}\nmessage: ${data['msg']['status'][0]['message']}');
+                          return Container(
+                              margin: const EdgeInsets.all(30),
+                              child: Text(
+                                'name: ${data['msg']['status'][0]['name']}\nmessage: ${data['msg']['status'][0]['message']}',
+                                style: const TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ));
                         } else {
                           return const Text('...');
                         }
@@ -159,6 +183,22 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                     StreamBuilder(
+                        stream: sensor_state.subscription,
+                        builder: (contextSensorState, snapshotSensorState) {
+                          Map<String, dynamic> data = jsonDecode(jsonEncode(snapshotSensorState.data));
+                          //var t=data['msg'].runtimeType;
+                          //data['msg']['battery'].toString();
+                          var c=double.parse(data['msg']['battery'].toString()).toStringAsFixed(2);
+                          if (snapshotSensorState.hasData) {
+                            //return Text('battery: ${data['msg']['battery'].toString()}');
+                            return Text('battery: $c');
+                            //return Text('msg : $t');
+                          } else {
+                            return const CircularProgressIndicator();
+                          }
+                        }),
+                    /*
+                    StreamBuilder(
                         stream: client_count.subscription,
                         builder: (contextClientCount, snapshotClientCount) {
                           Map<String, dynamic> clientCountData =
@@ -168,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                           } else {
                             return const Text('client count: 0');
                           }
-                        }),
+                        }),*/
                     /*
                     StreamBuilder(
                         stream: battery_state.subscription,
