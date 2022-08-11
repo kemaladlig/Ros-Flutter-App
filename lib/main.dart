@@ -15,7 +15,10 @@ class ExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Roslib Example',
-      theme: ThemeData(backgroundColor: Colors.grey[300]),
+      theme: ThemeData(
+          //brightness: Brightness.dark,
+          backgroundColor: Colors.grey[300]
+      ),
       home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
@@ -44,7 +47,7 @@ class _HomePageState extends State<HomePage> {
   bool isPressedDown = true;
   bool isPressedLeft = true;
   bool isPressedRight = true;
-  bool isPressedUpStop = true;
+  bool isPressedStop = true;
 
   //late Map<String, dynamic> sensorData={'msg': '{battery:0.0}'};
 
@@ -138,30 +141,72 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = Colors.grey[300];
-    Offset distance = isPressedUp ? const Offset(10, 10) : const Offset(28, 28);
-    double blur = isPressedUp ? 5.0 : 30.0;
+    Offset distanceUp = isPressedUp ? const Offset(7, 7) : const Offset(15, 15);
+    double blurUp = isPressedUp ? 5.0 : 30.0;
+    Offset distanceDown = isPressedDown ? const Offset(7, 7) : const Offset(15, 15);
+    double blurDown = isPressedDown ? 5.0 : 30.0;
+    Offset distanceLeft = isPressedLeft ? const Offset(7, 7) : const Offset(15, 15);
+    double blurLeft = isPressedLeft ? 5.0 : 30.0;
+    Offset distanceStop = isPressedStop ? const Offset(7, 7) : const Offset(15, 15);
+    double blurStop = isPressedStop? 5.0 : 30.0;
+    Offset distanceRight = isPressedRight ? const Offset(7, 7) : const Offset(15, 15);
+    double blurRight = isPressedRight ? 5.0 : 30.0;
+    double size=90;
+    double sizeStop=70;
     return StreamBuilder<Object>(
       stream: ros.statusStream,
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
         return Scaffold(
-          appBar: AppBar(
+          /*appBar: AppBar(
             title: const Text('Turtlebot'),
             centerTitle: true,
             //backgroundColor: Colors.purple,
             actions: [
               IconButton(onPressed: () => {}, icon: const Icon(Icons.settings))
             ],
-          ),
+          ),*/
           body: Container(
             margin:
-                const EdgeInsets.only(top: 20, bottom: 20, right: 20, left: 20),
+                const EdgeInsets.all(20),
             child: StreamBuilder<Object>(
               stream: ros.statusStream,
               builder: (context, snapshot) {
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                   Container(
+
+                        child: Container(
+                          width: 400,
+                          height: 400,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(23),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF868686),
+                                Color(0xFFA7A9AF),
+                              ],
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0xFF929292),
+                                offset: Offset(10, 10),
+                                blurRadius: 40,
+                                spreadRadius: 0.0,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.map_outlined,
+                            size: 300,
+                            color: Colors.amberAccent,
+                          ),
+                        ),
+                      ),
+
                     StreamBuilder(
                       stream: diagnostic.subscription,
                       builder: (context2, snapshot2) {
@@ -176,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ));
                         } else {
-                          return const Text('...');
+                          return const Text('.');
                         }
 
                         /*if (snapshot2.hasData) {
@@ -204,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                             //return Text('battery: ${sensorData['msg']['battery'].toString()}');
                             return Text('battery: $sensorBattery');
                           } else {
-                            return const CircularProgressIndicator();
+                            return const Text('.');
                           }
                         }),
                     /*
@@ -246,7 +291,7 @@ class _HomePageState extends State<HomePage> {
                               ? 'DISCONNECT'
                               : 'CONNECT'),
                           backgroundColor: snapshot.data == Status.CONNECTED
-                              ? Colors.green[400]
+                              ? Colors.green[200]
                               : Colors.grey[250],
                           onPressed: () {
                             if (kDebugMode) {
@@ -261,6 +306,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 50,),
                     const Padding(padding: EdgeInsets.only(bottom: 15.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -283,88 +329,151 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.grey[300],
                                 boxShadow: [
                                   BoxShadow(
-                                    blurRadius: blur,
-                                    offset: -distance,
-                                    color: Colors.white,
-                                  ),
-                                  BoxShadow(
-                                    blurRadius: blur,
-                                    offset: distance,
+                                    blurRadius: blurUp,
+                                    offset: distanceUp,
                                     color: const Color(0xFFA7A9AF),
                                   )
                                 ]),
                             child: Icon(
                               Icons.arrow_drop_up_outlined,
-                              size: 100,
-                              color: Colors.grey[500],
+                              size: size,
+                              color: Colors.grey[700],
                             ),
                           ),
                         ),
-                        const SizedBox(width: 50,),
-                        // Elevated Forward
-                        ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(130.0, 40.0),
-                            ),
-                            onPressed: () {
-                              linearCounter++;
-                              move(0.05, 0.0);
-                            },
-                            icon: const Icon(Icons.arrow_upward),
-                            label: const Text('Forward')),
+                        //const SizedBox(width: 50,),
                       ],
                     ),
-                    const Padding(padding: EdgeInsets.only(bottom: 30.0)),
+                    const Padding(padding: EdgeInsets.only(bottom: 10.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(130.0, 40.0),
+                        //
+                        // Left
+                        //
+                        Listener(
+                          onPointerUp: (_) => setState(() => isPressedLeft = false),
+                          onPointerDown: (_) =>
+                              setState( () {
+                                isPressedLeft= true;
+                                angularCounter++;
+                                move(0.0, 0.5);
+                              }),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: blurLeft,
+                                    offset: distanceLeft,
+                                    color: const Color(0xFFA7A9AF),
+                                  )
+                                ]),
+                            child: Icon(
+                              Icons.arrow_left_outlined,
+                              size: size,
+                              color: Colors.grey[700],
                             ),
-                            onPressed: () {
-                              angularCounter++;
-                              move(0.0, 0.05);
-                            },
-                            icon: const Icon(Icons.arrow_back),
-                            label: const Text('Left')),
-                        ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(130.0, 40.0),
+                          ),
+                        ),
+                        //
+                        // Stop
+                        //
+                        Listener(
+                          onPointerUp: (_) => setState(() => isPressedStop = false),
+                          onPointerDown: (_) =>
+                              setState( () {
+                                isPressedStop = true;
+                                linearCounter++;
+                                move(0.0, 0.0);
+                              }),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: blurStop,
+                                    offset: distanceStop,
+                                    color: const Color(0xFFA7A9AF),
+                                  )
+                                ]),
+                            child: Icon(
+                              Icons.pause,
+                              size: sizeStop,
+                              color: Colors.red[200],
                             ),
-                            onPressed: () {
-                              angularCounter = 0;
-                              linearCounter = 0;
-                              move(0.0, 0.0);
-                            },
-                            icon: const Icon(Icons.stop_circle_outlined),
-                            label: const Text('Stop')),
-                        ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(130.0, 40.0),
+                          ),
+                        ),
+                        //
+                        // Right
+                        //
+                        Listener(
+                          onPointerUp: (_) => setState(() => isPressedRight = false),
+                          onPointerDown: (_) =>
+                              setState( () {
+                                isPressedRight = true;
+                                angularCounter--;
+                                move(0.0, 0.5);
+                              }),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: blurRight,
+                                    offset: distanceRight,
+                                    color: const Color(0xFFA7A9AF),
+                                  )
+                                ]),
+                            child: Icon(
+                              Icons.arrow_right_outlined,
+                              size: size,
+                              color: Colors.grey[700],
                             ),
-                            onPressed: () {
-                              angularCounter--;
-                              move(0.0, 0.05);
-                            },
-                            icon: const Icon(Icons.arrow_forward),
-                            label: const Text('Right')),
+                          ),
+                        ),
                       ],
                     ),
-                    const Padding(padding: EdgeInsets.only(bottom: 30.0)),
+                    const Padding(padding: EdgeInsets.only(bottom: 10.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: const Size(130.0, 40.0),
+                        //
+                        // Down
+                        //
+                        Listener(
+                          onPointerUp: (_) => setState(() => isPressedDown = false),
+                          onPointerDown: (_) =>
+                              setState( () {
+                                isPressedDown = true;
+                                linearCounter--;
+                                move(0.05, 0.0);
+                              }),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: blurDown,
+                                    offset: distanceDown,
+                                    color: const Color(0xFFA7A9AF),
+                                  )
+                                ]),
+                            child: Icon(
+                              Icons.arrow_drop_down_outlined,
+                              size: size,
+                              color: Colors.grey[700],
                             ),
-                            onPressed: () {
-                              linearCounter--;
-                              move(0.05, 0.0);
-                            },
-                            icon: const Icon(Icons.arrow_downward),
-                            label: const Text('Backward')),
+                          ),
+                        ),
                       ],
                     ),
                   ],
