@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:roslib/roslib.dart';
@@ -14,10 +15,9 @@ class ExampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Roslib Example',
-      theme: ThemeData(
-        primaryColor: const Color(0xFFe21c24),
-      ),
+      theme: ThemeData(backgroundColor: Colors.grey[300]),
       home: const HomePage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -39,7 +39,14 @@ class _HomePageState extends State<HomePage> {
   late Topic odom;
   late Topic client_count;
   late Topic sensor_state;
-  late double sensor_battery;
+
+  bool isPressedUp = true;
+  bool isPressedDown = true;
+  bool isPressedLeft = true;
+  bool isPressedRight = true;
+  bool isPressedUpStop = true;
+
+  //late Map<String, dynamic> sensorData={'msg': '{battery:0.0}'};
 
   @override
   void initState() {
@@ -131,6 +138,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = Colors.grey[300];
+    Offset distance = isPressedUp ? const Offset(10, 10) : const Offset(28, 28);
+    double blur = isPressedUp ? 5.0 : 30.0;
     return StreamBuilder<Object>(
       stream: ros.statusStream,
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -185,14 +195,14 @@ class _HomePageState extends State<HomePage> {
                     StreamBuilder(
                         stream: sensor_state.subscription,
                         builder: (contextSensorState, snapshotSensorState) {
-                          Map<String, dynamic> data = jsonDecode(jsonEncode(snapshotSensorState.data));
-                          //var t=data['msg'].runtimeType;
-                          //data['msg']['battery'].toString();
-                          var c=double.parse(data['msg']['battery'].toString()).toStringAsFixed(2);
+                          Map<String, dynamic> sensorData =
+                              jsonDecode(jsonEncode(snapshotSensorState.data));
                           if (snapshotSensorState.hasData) {
-                            //return Text('battery: ${data['msg']['battery'].toString()}');
-                            return Text('battery: $c');
-                            //return Text('msg : $t');
+                            var sensorBattery = double.parse(
+                                    sensorData['msg']['battery'].toString())
+                                .toStringAsFixed(2);
+                            //return Text('battery: ${sensorData['msg']['battery'].toString()}');
+                            return Text('battery: $sensorBattery');
                           } else {
                             return const CircularProgressIndicator();
                           }
@@ -236,8 +246,8 @@ class _HomePageState extends State<HomePage> {
                               ? 'DISCONNECT'
                               : 'CONNECT'),
                           backgroundColor: snapshot.data == Status.CONNECTED
-                              ? Colors.green[300]
-                              : Colors.grey[300],
+                              ? Colors.green[400]
+                              : Colors.grey[250],
                           onPressed: () {
                             if (kDebugMode) {
                               print(snapshot.data);
@@ -254,7 +264,44 @@ class _HomePageState extends State<HomePage> {
                     const Padding(padding: EdgeInsets.only(bottom: 15.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: <Widget>[
+                        //
+                        // Forward
+                        //
+                        Listener(
+                          onPointerUp: (_) => setState(() => isPressedUp = false),
+                          onPointerDown: (_) =>
+                              setState( () {
+                                isPressedUp = true;
+                                linearCounter++;
+                                move(0.05, 0.0);
+                              }),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                color: Colors.grey[300],
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: blur,
+                                    offset: -distance,
+                                    color: Colors.white,
+                                  ),
+                                  BoxShadow(
+                                    blurRadius: blur,
+                                    offset: distance,
+                                    color: const Color(0xFFA7A9AF),
+                                  )
+                                ]),
+                            child: Icon(
+                              Icons.arrow_drop_up_outlined,
+                              size: 100,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 50,),
+                        // Elevated Forward
                         ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
                               minimumSize: const Size(130.0, 40.0),
