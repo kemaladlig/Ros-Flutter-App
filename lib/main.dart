@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,11 +44,11 @@ class _HomePageState extends State<HomePage> {
   late Topic client_count;
   late Topic sensor_state;
 
-  bool isPressedUp = true;
-  bool isPressedDown = true;
-  bool isPressedLeft = true;
-  bool isPressedRight = true;
-  bool isPressedStop = true;
+  bool isPressedUp = false;
+  bool isPressedDown = false;
+  bool isPressedLeft = false;
+  bool isPressedRight = false;
+  bool isPressedStop = false;
 
   //late Map<String, dynamic> sensorData={'msg': '{battery:0.0}'};
 
@@ -142,7 +143,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     Offset distanceUp = isPressedUp ? const Offset(7, 7) : const Offset(15, 15);
-    double blurUp = isPressedUp ? 5.0 : 30.0;
+    double blurUp = isPressedUp ? 10.0 : 20.0;
     Offset distanceDown = isPressedDown ? const Offset(7, 7) : const Offset(15, 15);
     double blurDown = isPressedDown ? 5.0 : 30.0;
     Offset distanceLeft = isPressedLeft ? const Offset(7, 7) : const Offset(15, 15);
@@ -153,6 +154,7 @@ class _HomePageState extends State<HomePage> {
     double blurRight = isPressedRight ? 5.0 : 30.0;
     double size=90;
     double sizeStop=70;
+
     return StreamBuilder<Object>(
       stream: ros.statusStream,
       builder: (context, AsyncSnapshot<dynamic> snapshot) {
@@ -175,37 +177,34 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                    Container(
-
-                        child: Container(
-                          width: 400,
-                          height: 400,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(23),
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xFF868686),
-                                Color(0xFFA7A9AF),
-                              ],
-                            ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0xFF929292),
-                                offset: Offset(10, 10),
-                                blurRadius: 40,
-                                spreadRadius: 0.0,
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.map_outlined,
-                            size: 300,
-                            color: Colors.amberAccent,
-                          ),
-                        ),
-                      ),
+                     width: 400,
+                     height: 400,
+                     decoration: BoxDecoration(
+                       color: Colors.grey[200],
+                       borderRadius: BorderRadius.circular(23),
+                       gradient: const LinearGradient(
+                         begin: Alignment.topLeft,
+                         end: Alignment.bottomRight,
+                         colors: [
+                           Color(0xFFA9A9A9),
+                           Color(0xFFB8B8B8),
+                         ],
+                       ),
+                       boxShadow: const [
+                         BoxShadow(
+                           color: Color(0xFF929292),
+                           offset: Offset(5, 5),
+                           blurRadius: 40,
+                           spreadRadius: 0.0,
+                         ),
+                       ],
+                     ),
+                     child: const Icon(
+                       Icons.map_outlined,
+                       size: 300,
+                       color: Colors.amberAccent,
+                     ),
+                   ),
 
                     StreamBuilder(
                       stream: diagnostic.subscription,
@@ -221,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                                     fontSize: 20, fontWeight: FontWeight.bold),
                               ));
                         } else {
-                          return const Text('.');
+                          return const Text('');
                         }
 
                         /*if (snapshot2.hasData) {
@@ -249,7 +248,7 @@ class _HomePageState extends State<HomePage> {
                             //return Text('battery: ${sensorData['msg']['battery'].toString()}');
                             return Text('battery: $sensorBattery');
                           } else {
-                            return const Text('.');
+                            return const Text('');
                           }
                         }),
                     /*
@@ -283,13 +282,19 @@ class _HomePageState extends State<HomePage> {
                             return const CircularProgressIndicator();
                           }
                         }),*/
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         ActionChip(
+                          elevation: 1,
                           label: Text(snapshot.data == Status.CONNECTED
                               ? 'DISCONNECT'
-                              : 'CONNECT'),
+                              : 'CONNECT TURTLEBOT3 BURGER',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400
+                          ),),
                           backgroundColor: snapshot.data == Status.CONNECTED
                               ? Colors.green[200]
                               : Colors.grey[250],
@@ -304,9 +309,21 @@ class _HomePageState extends State<HomePage> {
                             }
                           },
                         ),
+                        const SizedBox(width: 50,),
+                        Chip(
+                          elevation: 1,
+                          padding: const EdgeInsets.all(6),
+                          backgroundColor: Colors.grey[300],
+                          shadowColor: Colors.black,
+                          avatar: const Text('78'
+                          ), //CircleAvatar
+                          label: const Icon( Icons.battery_charging_full_sharp,
+                            color: Color(0xFF777777),
+                          ), //Text
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 50,),
+                    const SizedBox(height: 10,),
                     const Padding(padding: EdgeInsets.only(bottom: 15.0)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -332,7 +349,7 @@ class _HomePageState extends State<HomePage> {
                                     blurRadius: blurUp,
                                     offset: distanceUp,
                                     color: const Color(0xFFA7A9AF),
-                                  )
+                                  ),
                                 ]),
                             child: Icon(
                               Icons.arrow_drop_up_outlined,
