@@ -49,6 +49,12 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
+  flutter_native_splash: ^2.0.1+1
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/birfen.png
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
