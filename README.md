@@ -1,6 +1,6 @@
 # Ros Flutter App
 
-This is a Flutter cross platform project for interacting with ROS (Robot Operating System) nodes. Main function of the app is navigate the robot and showing some information about the robot sensors, location, map and more. For interfacing with ROS nodes `roslib.dart` library.
+This is a Flutter cross platform project for interacting with ROS (Robot Operating System) nodes. Main function of the app is navigate the robot and showing some information about the robot sensors, location, map and more. For interfacing with ROS nodes `roslib.dart` library is used.
 
 Some screenshots from application.
 
@@ -54,8 +54,8 @@ Bring up
 roslaunch turtlebot3_bringup turtlebot3_robot.launch
 ```
 
-#### Similation
-You can use gazebo turtlebot3 simulation.
+#### Simulation
+You can use gazebo turtlebot3 simulation environment.
 
 Type
 ```bash
