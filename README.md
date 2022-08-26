@@ -30,7 +30,7 @@ You can follow this [offical website](http://wiki.ros.org/noetic/Installation/Ub
 
 Install Ros Bridge.
 ```bash
-sudo apt install ros-melodic-rosbridge-server
+sudo apt install ros-noetic-rosbridge-server
 ```
 
 Also this [website](https://docs.flutter.dev/get-started/install/linux) would guide you to prepare your system to start developing Flutter applications on Android Studio.
@@ -41,14 +41,28 @@ Also this [website](https://docs.flutter.dev/get-started/install/linux) would gu
 ```bash
 roscore
 ```
-2. Prepare your robot or simulation.
+2. Prepare either the robot or simulation environment.
 
 #### Robot
 
-Find the robots ip and change it down below.
+If you do not have ssh, type in terminal 
+```bash
+sudo apt-get install openssh-client
+```
+In case of learning robot's ip address, arp-scan can be used.
+```bash
+sudo apt-get -y install arp-scan
+```
+Edit ip addresses here except last '.0' and '.255'.
+```bash
+sudo arp-scan 192.168.0.0-192.168.0.255
+```
+
+Find the robot's ip and change it down below.
 ```bash
 ssh robot_name@192.168.0.0
 ```
+
 Bring up
 ```bash
 roslaunch turtlebot3_bringup turtlebot3_robot.launch
