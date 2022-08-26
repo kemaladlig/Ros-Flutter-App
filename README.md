@@ -82,7 +82,7 @@ roslaunch turtlebot3_navigation turtlebot3_navigation.launch map_file:=/home/use
 roslaunch rosbridge_server rosbridge_websocket.launch address:=192.168.0.0
 ```
 
-4. Now, you can start your application and hit connect button.
+4. Now, you can start your application and hit connect button. In case of not getting no-null-safety error, you can type 'flutter run --no-sound-null-safety' in Android Studio terminal. In order to do not type this command everytime, you can change in Android Studio:  Run -> Edit Configurations -> Add '--no-sound-null-safety' into Additional run args.
 5. Configure your ip address (ros_hostname) inside the app.
 
 Make sure you are on the same wifi on your mobile device and computer which is running roscore.
